@@ -1,7 +1,8 @@
 "use client";
 
 import { ActionManager, ExecuteCodeAction, Mesh, VideoTexture } from "@babylonjs/core";
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, use, useEffect, useRef } from "react";
+import { useParams, useRouter } from "next/navigation";
 
 import Image from "next/image";
 import { Location } from "../type";
@@ -13,14 +14,14 @@ import { createScene } from "@/util/createScene";
 import { createVideoTexture } from "@/util/createVideoTexture";
 import { useAccessStore } from "../store/accessStore";
 import { useHintStore } from "../store/hintStore";
-import { useRouter } from "next/navigation";
 
-export default function Panaroms({ params }: { params: { location: Location } }): ReactNode {
+export default function Panaroms(): ReactNode {
   const { isPermissionAccess } = useAccessStore();
   const { setHintTrigger } = useHintStore();
   const router = useRouter();
   const canvas = useRef(null);
-  const location = params.location;
+  const params = useParams();
+  const location = params.location as string | undefined;
 
   useEffect(() => {
     const scene = createScene(canvas.current!, isPermissionAccess);

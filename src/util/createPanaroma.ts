@@ -1,8 +1,8 @@
-import { Scene, PhotoDome } from "@babylonjs/core";
+import { PhotoDome, Scene } from "@babylonjs/core";
 
-export const createPanaroma = (scene: Scene | null, location: string) => {
+export const createPanaroma = (scene: Scene | null, location: string | undefined) => {
   if (!scene) return null;
-  if (location.length === 0) return null;
+  if (location?.length === 0) return null;
   const imageSrc = `/panaroms/${location}.webp`;
 
   //photoDome
@@ -13,7 +13,7 @@ export const createPanaroma = (scene: Scene | null, location: string) => {
       resolution: 64,
       size: 400,
     },
-    scene
+    scene,
   );
 
   return dome;
