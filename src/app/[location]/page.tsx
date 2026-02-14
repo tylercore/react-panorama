@@ -1,22 +1,19 @@
 "use client";
 
-import { ReactNode, useRef, useEffect } from "react";
+import { ActionManager, ExecuteCodeAction, Mesh, VideoTexture } from "@babylonjs/core";
+import { ReactNode, useEffect, useRef } from "react";
+
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { Mesh, VideoTexture, ActionManager, ExecuteCodeAction } from "@babylonjs/core";
-
-import { createScene } from "@/util/createScene";
-import { createPanaroma } from "@/util/createPanaroma";
-import { createLauncher } from "@/util/createLauncher";
-import { createVideoTexture } from "@/util/createVideoTexture";
-
+import { Location } from "../type";
 import RequestPermission from "./components/requestPermission";
 import SlideHint from "./components/slideHint";
-
+import { createLauncher } from "@/util/createLauncher";
+import { createPanaroma } from "@/util/createPanaroma";
+import { createScene } from "@/util/createScene";
+import { createVideoTexture } from "@/util/createVideoTexture";
 import { useAccessStore } from "../store/accessStore";
 import { useHintStore } from "../store/hintStore";
-
-import { Location } from "../type";
+import { useRouter } from "next/navigation";
 
 export default function Panaroms({ params }: { params: { location: Location } }): ReactNode {
   const { isPermissionAccess } = useAccessStore();
@@ -28,7 +25,7 @@ export default function Panaroms({ params }: { params: { location: Location } })
   useEffect(() => {
     const scene = createScene(canvas.current!, isPermissionAccess);
     const dome = createPanaroma(scene, location);
-    let video: { videoPlane: Mesh; videoTexture: VideoTexture };
+    let video: { videoPlane: Mesh; videoTexture: VideoTexture } | undefined;
     if (location === "theater") {
       const launcher = createLauncher(scene);
       const actionManager = new ActionManager(scene);
@@ -37,7 +34,7 @@ export default function Panaroms({ params }: { params: { location: Location } })
         new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
           createVideoTexture(scene);
           launcher.dispose(false, true);
-        })
+        }),
       );
     }
 
@@ -47,10 +44,13 @@ export default function Panaroms({ params }: { params: { location: Location } })
       video?.videoPlane.dispose();
       video?.videoTexture.dispose();
     };
-  }, [isPermissionAccess]);
+  }, [isPermissionAccess, location]);
 
   return (
-    <section className="z-100 absolute flex justify-center items-center w-full h-full bg-black py-8" onClick={returnToHome}>
+    <section
+      className="z-100 absolute flex justify-center items-center w-full h-full bg-black py-8"
+      onClick={returnToHome}
+    >
       <canvas
         id="canvas"
         className="z-0 w-full max-h-full active:border-0 focus:border-0"
@@ -70,7 +70,9 @@ export default function Panaroms({ params }: { params: { location: Location } })
       <SlideHint />
       <RequestPermission />
 
-      <h3 className="absolute top-12 landscape:hidden text-white text-lg md:text-3xl font-bold">行動設備建議轉為橫向觀看</h3>
+      <h3 className="absolute top-12 landscape:hidden text-white text-lg md:text-3xl font-bold">
+        行動設備建議轉為橫向觀看
+      </h3>
     </section>
   );
 
